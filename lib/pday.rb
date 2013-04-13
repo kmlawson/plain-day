@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/env ruby
 
 require 'methadone'
 require 'date'
@@ -60,7 +60,7 @@ main do
     puts "Creating new entry for: "+entrydate
     `echo '#{prepopulate(entrydate)}' > #{filepath}`
     puts "Editing entry..."
-    puts "#{options['editor']} #{filepath}"
+    `#{options['editor']} #{filepath}`
 end
 
 version     '0.1'
