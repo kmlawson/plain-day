@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+require 'methadone'
+require 'date'
+
+include Methadone::Main
+
+path="/Users/fool/Documents/Docs/Me/Log/"
+def isdate testdate
+    begin 
+        Date.parse(testdate)
+        true
+    rescue
+        false
+    end
+end
+
+def prepopulate headertext
+    return "# "+headertext
+end
+
+main do
+    unless options[:date]
+        # Use today's date unless there is one supplied
+        entrydate=Time.now.strftime("%Y.%m.%d")
+    else
+        entrydate=options['date']
+    end
+    if options[:suffix]
+        suffix='-'+options['suffix']
+    else
+        suffix=''
+    end
+    # Build the command:
+    filepath=path+entrydate+suffix+'.'+options['format']
+    puts "Creating new entry for: "+entrydate
+    `echo '#{prepopulate entrydate} > #{filepath}`
+    puts "Editing entry..."
+    puts `#{options['editor']} #{filepath}`
+end
+
+version     '0.1'
+description 'Simple plain text diary management script.'
+
+opts.on("-d DATE","--date","Supply an explicit date. Also accepts 'yesterday' or 'y'") do |date|
+    if date=='yesterday' || date=='y'
+        date=(Time.now-86400).strftime("%Y.%m.%d")
+    end
+
+    unless isdate(date)
+        puts "DATE must be a valid date. For example '2013.1.15' or '01/15/2013' or 'Jan 1, 2013' or 'yesterday'"
+    end
+    options[:date]=true
+    options['date']=Date.parse(date).strftime("%Y.%m.%d")
+end
+options['format'] = 'md'
+on("-f FORMAT","--format","Set format suffix")
+on("-s SUFFIX","--suffix","Add suffix")
+options['editor'] = 'mvim'
+on("-e EDITOR","--editor","Set the editor, vim, emacs, nano, etc.")
+
+go!
