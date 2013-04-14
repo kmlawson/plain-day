@@ -24,7 +24,7 @@ end
 
 main do
     default_options=Hash.new
-    default_options['suffix-delimit'] = ' - '
+    default_options['suffix-delimit'] = '-'
     default_options['format'] = 'md'
     default_options['editor'] = 'vim'
     # Load the .dayconfig file and merge in options there:
@@ -58,12 +58,12 @@ main do
     # Build the command:
     filepath=options['path']+entrydate+suffix+'.'+options['format']
     puts "Creating new entry for: "+entrydate
-    `echo '#{prepopulate(entrydate)}' > #{filepath}`
+    `echo '#{prepopulate(entrydate)}' > '#{filepath}'`
     puts "Editing entry..."
-    `#{options['editor']} #{filepath}`
+    `#{options['editor']} '#{filepath}'`
 end
 
-version     '0.1'
+version     '0.2'
 description 'Simple plain text diary management script.'
 
 opts.on("-d DATE","--date","Supply an explicit date. Also accepts 'yesterday' or 'y'") do |date|
