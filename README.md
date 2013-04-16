@@ -9,6 +9,9 @@ From the command line:
 ```
 gem install pday
 ```
+
+I am not sure why but I think this script requires you have Ruby 1.9.3 or later.
+
 ## Configuration
 
 Create a yaml file in your home folder called `.dayconfig`
