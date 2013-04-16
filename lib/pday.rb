@@ -5,7 +5,6 @@ require 'date'
 require 'yaml'
 
 include Methadone::Main
-include Methadone::CLILogging
 
 def isdate testdate
     begin 
@@ -104,7 +103,7 @@ main do
         `echo '#{prepopulate(entrydate)}' > "#{filepath}"` # NEED TO ESCAPE FILEPATH FOR SPACES
     end
     puts "Editing entry: #{filepath}"
-    `#{options['editor']} "#{filepath}"`
+    exec("#{options['editor']} '#{filepath}'")
 end
 
 version     '0.3'
