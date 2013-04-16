@@ -2,6 +2,7 @@
 
 More things to add or consider:
 
+* Add ability to add one line log to existing file
 * work on prepopulate for more advanced templating of diary entries
 * fix symbol vs. string hash stuff
 * add tests
