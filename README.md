@@ -20,7 +20,7 @@ It must contain at least one configuration variable:
 path: '[PATH TO YOUR DIARY DIRECTORY]'
 ```
 
-This path will determine where new diary entries are created.
+This path will determine where new diary entries are created. You can also set the defaul `format`, `suffix`, and `editor` in this configuration file.
 
 Other options are available if you show the help: `pday --help`
 
