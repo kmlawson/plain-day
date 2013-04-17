@@ -5,6 +5,7 @@ require 'date'
 require 'yaml'
 
 include Methadone::Main
+include Methadone::CLILogging
 
 def isdate testdate
     begin 
@@ -18,7 +19,11 @@ end
 # REVISIT THIS TO MAKE THE HEADER TEXT CUSTOMIZABLE
 # Default to a Header 1 in Markdown:
 def prepopulate headertext
-    return "# "+headertext
+    return "# "+headertext+"\n\n"
+end
+
+def formatlog logtext
+    return "* "+logtext
 end
 
 def formatdate requesteddate, dateformat
@@ -42,12 +47,13 @@ end
 
 main do
 
-    #Set up default options
+    # DEFAULT OPTIONS HANDLING
     default_options=Hash.new
     default_options['suffix-delimit'] = '-'
     default_options['format'] = 'md'
     default_options['editor'] = 'vim'
     default_options['date-format'] = "%Y.%m.%d"
+    default_options['timestamp'] = true
     # Load the .dayconfig file and merge in options there:
     CONFIG_FILE = File.join(ENV['HOME'],'.dayconfig') 
     if File.exists? CONFIG_FILE
@@ -59,7 +65,7 @@ main do
     end
     default_options.merge!(options)
     options.merge!(default_options)
-
+    # END DEFAULT OPTIONS HANDLING
 
     # Check if the diary directory is found:
     unless options['path']
@@ -81,7 +87,7 @@ main do
         end
     end
 
-    # Check to see if there is a suffix, and if so, add the suffix delimiter:
+    # CHECK TO SEE IF THERE IS A SUFFIX, AND IF SO, ADD THE SUFFIX DELIMITER:
     if options[:suffix]
         suffix=options['suffix-delimit']+options['suffix']
     else
@@ -89,31 +95,44 @@ main do
     end
 
 
-    # Build the command to create the file with the header and edit it:
+    # BUILD THE COMMAND TO CREATE THE FILE WITH THE HEADER AND EDIT IT:
     filepath=options['path']+entrydate+suffix+'.'+options['format']
     if File.file?(filepath)
         unless options[:force]
-            puts "File already exists. Will open existing file."
+            puts "File already exists. Will use existing file."
         else
             puts "File already exists, replacing it."
             `echo '#{prepopulate(entrydate)}' > "#{filepath}"`
         end
     else
         puts "Creating new entry for: "+entrydate
-        `echo '#{prepopulate(entrydate)}' > "#{filepath}"` # NEED TO ESCAPE FILEPATH FOR SPACES
+        `echo '#{prepopulate(entrydate)}' > "#{filepath}"` 
     end
-    puts "Editing entry: #{filepath}"
-    exec("#{options['editor']} '#{filepath}'")
+    unless options[:log]
+        puts "Editing entry: #{filepath}"
+        exec("#{options['editor']} '#{filepath}'")
+    else
+        # THE LOG OPTION IS ON SO JUST APPEND A LINE
+        if options['log']!=''
+            puts "Adding log entry to: #{filepath}"
+            if options[:timestamp]
+                options['log']=Time.new.strftime("%H:%M")+" "+options['log']
+            end
+            exec("echo '#{formatlog(options['log'])}' >> #{filepath}")
+        end
+    end
 end
 
 version     '0.3'
 description 'Simple plain text diary management script.'
 
 on("-t FORMAT","--format","Set format suffix")
-on("-f","--force","If a file already exists with that name, replace it instead of editing existing")
+on("-f","--force","Replace any existing file instead of editing it")
 on("-s SUFFIX","--suffix","Add suffix to file name (before format suffix)")
 on("-e EDITOR","--editor","Set the editor, vim, emacs, nano, etc.")
-on("-d DATE","--date","Supply an explicit date. Also accepts 'yesterday' or 'y'") 
+on("-d DATE","--date","Supply an explicit date (also y, yy, yyy, t) ") 
+on("-l LOG","--log","Instead of opening file, add a single log line")
+on("-p","--timestamp","Add timestamp to single line log")
 
 
 go!
