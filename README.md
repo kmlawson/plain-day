@@ -51,4 +51,12 @@ Combining these, consider the following command:
 
 This will open a blank diary entry for yesterday's date, with `-work.txt` as its suffix and format.
 
+### Simple Log Feature
 
+By default pday will create a log file for today or the date supplied, including a simple header in that file, and will open the file in the editor (either vim, the default or, whatever `-e/--editor` supplied).
+
+If, instead, you simply wish to add a single line to your log, add the `-l/--log` option followed by the text you wish to append to your log. If the log file does not already exist it will be added. For example:  
+
+`pday -l 'This is my log update'`
+
+If you add the `-p/--timestamp` option to this, the log line will have a timestamp prefix.
