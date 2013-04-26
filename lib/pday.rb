@@ -99,40 +99,61 @@ main do
     filepath=options['path']+entrydate+suffix+'.'+options['format']
     if File.file?(filepath)
         unless options[:force]
-            puts "File already exists. Will use existing file."
+            if options[:verbose]
+                puts "File already exists. Will use existing file."
+            end
         else
-            puts "File already exists, replacing it."
+            if options[:verbose]
+                puts "File already exists, replacing it."
+            end
             `echo '#{prepopulate(entrydate)}' > "#{filepath}"`
         end
     else
-        puts "Creating new entry for: "+entrydate
+        if options[:verbose]
+            puts "Creating new entry for: "+entrydate
+        end
         `echo '#{prepopulate(entrydate)}' > "#{filepath}"` 
     end
-    unless options[:log]
-        puts "Editing entry: #{filepath}"
-        exec("#{options['editor']} '#{filepath}'")
+    if !options[:log]
+        if !options[:output]
+            if options[:verbose]
+                puts "Editing entry: #{filepath}"
+            end
+            exec("#{options['editor']} '#{filepath}'")
+        else
+            exec("cat #{filepath}")
+        end
     else
         # THE LOG OPTION IS ON SO JUST APPEND A LINE
         if options['log']!=''
-            puts "Adding log entry to: #{filepath}"
+            if options[:verbose]
+                puts "Adding log entry to: #{filepath}"
+            end
             if options[:timestamp]
                 options['log']=Time.new.strftime("%H:%M")+" "+options['log']
             end
-            exec("echo '#{formatlog(options['log'])}' >> #{filepath}")
+            if options[:output]
+                addoutput="; cat #{filepath}"
+            else
+                addoutput=""
+            end
+            exec("echo '#{formatlog(options['log'])}' >> #{filepath}#{addoutput}")
         end
     end
 end
 
-version     '0.3'
+version     '0.5'
 description 'Simple plain text diary management script.'
 
 on("-t FORMAT","--format","Set format suffix")
+on("-o","--output","Output the log file instead of opening it")
 on("-f","--force","Replace any existing file instead of editing it")
 on("-s SUFFIX","--suffix","Add suffix to file name (before format suffix)")
 on("-e EDITOR","--editor","Set the editor, vim, emacs, nano, etc.")
 on("-d DATE","--date","Supply an explicit date (also y, yy, yyy, t) ") 
 on("-l LOG","--log","Instead of opening file, add a single log line")
 on("-p","--timestamp","Add timestamp to single line log")
+on("-v","--verbose","Show more information when executing")
 
 
 go!
