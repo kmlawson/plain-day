@@ -2,7 +2,6 @@
 
 More things to add or consider:
 
-* Add ability to add one line log to existing file
 * work on prepopulate for more advanced templating of diary entries
 * fix symbol vs. string hash stuff
 * add tests
@@ -13,3 +12,4 @@ More things to add or consider:
 * add a simple search interface
 * add ability to merge files together by month etc.
 * this is a direct YAML import, make script more secure by only pulling in certain variables and checking them
+* add encryption feature
